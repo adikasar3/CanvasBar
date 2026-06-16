@@ -4,6 +4,7 @@ import Combine
 
 class AssignmentStore: ObservableObject {
     @Published var assignments: [Assignment] = []
+    @Published var notes: [Note] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -13,6 +14,16 @@ class AssignmentStore: ObservableObject {
 
     func loadSampleAssignments() {
         assignments = []
+    }
+
+    func addNote(_ text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        notes.append(Note(text: trimmed))
+    }
+
+    func removeNote(_ note: Note) {
+        notes.removeAll { $0.id == note.id }
     }
 
     @MainActor

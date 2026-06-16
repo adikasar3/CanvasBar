@@ -5,4 +5,5 @@ struct Assignment: Identifiable {
     let title: String
     let course: String
     let dueDate: Date
+    var isDone: Bool = false
 }

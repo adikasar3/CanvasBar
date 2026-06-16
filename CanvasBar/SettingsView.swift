@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 struct SettingsView: View {
     @EnvironmentObject var store: AssignmentStore
@@ -6,6 +7,7 @@ struct SettingsView: View {
 
     @State private var statusMessage = ""
     @State private var isTesting = false
+    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -37,10 +39,17 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
+            Divider()
+
+            Toggle("Launch at startup", isOn: $launchAtLogin)
+                .onChange(of: launchAtLogin) { _, newValue in
+                    setLaunchAtLogin(newValue)
+                }
+
             Spacer()
         }
         .padding()
-        .frame(width: 440, height: 210)
+        .frame(width: 440, height: 260)
     }
 
     private func testFeed() async {
@@ -57,6 +66,18 @@ struct SettingsView: View {
         }
 
         isTesting = false
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+        }
     }
 }
 

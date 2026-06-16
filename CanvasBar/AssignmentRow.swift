@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AssignmentRow: View {
-    let assignment: Assignment
+    @Binding var assignment: Assignment
 
     private var dueDateText: String {
         let formatter = DateFormatter()
@@ -11,9 +11,19 @@ struct AssignmentRow: View {
 
     var body: some View {
         HStack {
+            Button {
+                assignment.isDone.toggle()
+            } label: {
+                Image(systemName: assignment.isDone ? "checkmark.square.fill" : "square")
+                    .foregroundColor(assignment.isDone ? .accentColor : .secondary)
+            }
+            .buttonStyle(.plain)
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(assignment.title)
                     .font(.body)
+                    .strikethrough(assignment.isDone)
+                    .foregroundColor(assignment.isDone ? .secondary : .primary)
 
                 Text(assignment.course)
                     .font(.caption)
@@ -32,10 +42,12 @@ struct AssignmentRow: View {
 
 #Preview {
     AssignmentRow(
-        assignment: Assignment(
-            title: "Physics Homework 7",
-            course: "PHYS 121",
-            dueDate: Date()
+        assignment: .constant(
+            Assignment(
+                title: "Physics Homework 7",
+                course: "PHYS 121",
+                dueDate: Date()
+            )
         )
     )
 }

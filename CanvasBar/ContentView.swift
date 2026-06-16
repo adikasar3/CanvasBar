@@ -7,6 +7,8 @@ struct ContentView: View {
     @AppStorage("canvasURL")
     private var canvasURL = ""
 
+    @State private var newNoteText = ""
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Assignments Due Today")
@@ -17,6 +19,10 @@ struct ContentView: View {
             Divider()
 
             assignmentList
+
+            Divider()
+
+            notesSection
 
             Divider()
 
@@ -50,11 +56,46 @@ struct ContentView: View {
 
     private var assignmentList: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ForEach(store.assignments) { assignment in
-                AssignmentRow(assignment: assignment)
+            ForEach($store.assignments) { $assignment in
+                AssignmentRow(assignment: $assignment)
 
                 if assignment.id != store.assignments.last?.id {
                     Divider()
+                }
+            }
+        }
+    }
+
+    private var notesSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Notes")
+                .font(.headline)
+
+            ForEach($store.notes) { $note in
+                HStack {
+                    NoteRow(note: $note)
+
+                    Button {
+                        store.removeNote(note)
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            HStack {
+                TextField("Jot something down...", text: $newNoteText)
+                    .textFieldStyle(.roundedBorder)
+                    .onSubmit {
+                        store.addNote(newNoteText)
+                        newNoteText = ""
+                    }
+
+                Button("Add") {
+                    store.addNote(newNoteText)
+                    newNoteText = ""
                 }
             }
         }
